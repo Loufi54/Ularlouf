@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULAR TANGGA GHOST</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background: #fff;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .description {
+            max-width: 600px;
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+            display: block;
+            animation: slideDown 1s ease-in-out;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(10, 40px);
+            gap: 1px;
+            margin-bottom: 20px;
+            position: relative;
+            animation: slideUp 1s ease-in-out;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .cell:nth-child(even) {
+            background-color: #ecf0f1;
+        }
+
+        .cell:hover {
+            background-color: #dcdcdc;
+        }
+
+        .snake, .ladder {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            opacity: 0.7;
+            z-index: -1;
+        }
+
+        .snake {
+            background: url('https://upload.wikimedia.org/wikipedia/commons/7/71/A_Snake.svg') no-repeat center center;
+        }
+
+        .ladder {
+            background: url('https://upload.wikimedia.org/wikipedia/commons/e/e0/Long_ladder.svg') no-repeat center center;
+        }
+
+        .player {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.5rem;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            transition: top 0.3s ease-out, left 0.3s ease-out;
+            background-position: center;
+            background-size: cover;
+            z-index: 1;
+        }
+
+        .player-1 { background-color: #3498db; }
+        .player-2 { background-color: #e74c3c; }
+        .player-3 { background-color: #f1c40f; }
+        .player-4 { background-color: #2ecc71; }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .roll-dice {
+            padding: 10px 15px;
+            background-color: #1abc9c;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .roll-dice:hover {
+            background-color: #16a085;
+        }
+
+        .dice-result {
+            font-size: 1rem;
+            color: #e67e22;
+        }
+
+        .result, .new-game {
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .result p {
+            font-size: 0.9rem;
+            margin: 5px 0;
+        }
+
+        .new-game button {
+            padding: 10px 15px;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .new-game button:hover {
+            background-color: #c0392b;
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: slideUp 1s ease-in-out;
+        }
+
+        .player-info input[type="text"] {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        .player-info input[type="text"]:focus {
+            border-color: #3498db;
+        }
+
+        .player-info input[type="file"] {
+            margin: 5px 0;
+        }
+
+        .player-info button {
+            padding: 10px 20px;
+            background-color: #2980b9;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .player-info button:hover {
+            background-color: #3498db;
+        }
+
+        .game-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .game-options button {
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .game-options button:hover {
+            background-color: #c0392b;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="description" id="gameDescription">
+        <h1>Selamat Datang di Game ular tangga ghost!</h1>
+        <p>Game Ular Tangga Keren membawa pengalaman bermain Klasik Ular Tangga ke dekade baru dengan tampilan modern dan fitur menarik. Permainan ini cocok untuk segala usia dan dapat dimainkan hingga empat pemain, termasuk dengan lawan komputer.</p>
+        <p>Dalam game ini, kamu harus mencapai petak terakhir dengan menghindari ular yang akan membawa kamu kembali ke petak sebelumnya dan memanfaatkan tangga untuk melompat ke atas dengan cepat. Bagaimana persiapan kamu untuk mencapai kemenangan dan mengalahkan lawan-lawanmu?, note: tangga dan ular tidak keliatan</p>
+        <div class="game-options">
+            <button onclick="selectGameType(1)">1 VS 1 (Komputer)</button>
+            <button onclick="selectGameType(3)">1 Player, 3 Komputer</button>
+        </div>
+    </div>
+    <div class="container" id="startGame" style="display:none;">
+        <h1>Isi profile</h1>
+        <div class="player-info">
+            <input type="text" id="player1" placeholder="Nama kamu">
+            <input type="file" id="player1Image" accept="image/*">
+            <button onclick="initGame()">Mulai Permainan</button>
+        </div>
+    </div>
+    <div class="container" id="gameContainer" style="display:none;">
+        <h1>ular tangga ghost</h1>
+        <div class="board" id="board"></div>
+        <div class="controls">
+            <button class="roll-dice" id="rollDiceButton" onclick="rollDice()">Roll Dice</button>
+            <div class="dice-result" id="diceResult">🎲: 0</div>
+        </div>
+        <div class="result" id="result">
+            <h2>Hasil Akhir</h2>
+            <div id="winnersList"></div>
+        </div>
+        <div class="new-game">
+            <button onclick="startNewGame()">Mulai Permainan Baru</button>
+        </div>
+    </div>
+
+    <script>
+        let isPlayerTurn = true; 
+        let gameOver = false;
+        let gameType = 1; 
+
+        const ladders = { 2: 23, 7: 29, 22: 37, 28: 77, 30: 96, 44: 58, 70: 89, 78: 97, 80: 99 };
+        const snakes = { 27: 5, 40: 3, 54: 31, 62: 19, 63: 60, 87: 36, 92: 72, 95: 75, 99: 78 };
+
+        let players = [];
+        let currentPlayerIndex = 0;
+
+        const board = document.getElementById('board');
+        const diceResult = document.getElementById('diceResult');
+        const rollDiceButton = document.getElementById('rollDiceButton');
+        const result = document.getElementById('result');
+        const winnersList = document.getElementById('winnersList');
+        const newGameButton = document.querySelector('.new-game');
+        const gameDescription = document.getElementById('gameDescription');
+        const startGameContainer = document.getElementById('startGame');
+        let winners = [];
+
+        function selectGameType(type) {
+            gameType = type;
+            startGameContainer.style.display = 'block';
+            gameDescription.style.display = 'none';
+        }
+
+        function initGame() {
+            const player1Name = document.getElementById('player1').value || "Pemain 1";
+            const player1Image = document.getElementById('player1Image').files[0];
+
+            if (player1Image) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    setupPlayers(player1Name, event.target.result);
+                    startGame();
+                };
+                reader.readAsDataURL(player1Image);
+            } else {
+                setupPlayers(player1Name);
+                startGame();
+            }
+        }
+
+        function setupPlayers(player1Name, player1Image = '') {
+            players = [
+                { id: 1, name: player1Name, position: 1, element: null, image: player1Image, colorClass: 'player-1', hasWon: false },
+                { id: 2, name: 'Komputer 1', position: 1, element: null, colorClass: 'player-2', hasWon: false }
+            ];
+
+            if (gameType === 3) {
+                players.push(
+                    { id: 3, name: 'Komputer 2', position: 1, element: null, colorClass: 'player-3', hasWon: false },
+                    { id: 4, name: 'Komputer 3', position: 1, element: null, colorClass: 'player-4', hasWon: false }
+                );
+            }
+        }
+
+        function startGame() {
+            startGameContainer.style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+
+            for (let i = 100; i > 0; i--) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.id = `cell-${i}`;
+                cell.innerText = i;
+                board.appendChild(cell);
+
+                if (ladders[i]) {
+                    const ladderImg = document.createElement('div');
+                    ladderImg.className = 'ladder';
+                    cell.appendChild(ladderImg);
+                }
+                if (snakes[i]) {
+                    const snakeImg = document.createElement('div');
+                    snakeImg.className = 'snake';
+                    cell.appendChild(snakeImg);
+                }
+            }
+
+            players.forEach(player => {
+                player.element = document.createElement('div');
+                player.element.className = `player ${player.colorClass}`;
+                if (player.image) {
+                    player.element.style.backgroundImage = `url(${player.image})`;
+                    player.element.style.backgroundSize = 'cover';
+                    player.element.style.backgroundPosition = 'center';
+                    player.element.style.backgroundColor = 'transparent';
+                    player.element.innerText = '';
+                } else {
+                    player.element.innerText = player.name;
+                }
+                board.appendChild(player.element);
+            });
+            updatePlayerPositions();
+        }
+
+        function rollDice() {
+            if (gameOver || (!isPlayerTurn && players[currentPlayerIndex].id === 1)) return;
+            
+            const currentPlayer = players[currentPlayerIndex];
+            if (currentPlayer.hasWon) {
+                nextTurn();
+                return;
+            }
+
+            const diceValue = Math.floor(Math.random() * 6) + 1;
+            diceResult.innerText = `🎲: ${diceValue}`;
+            movePlayer(currentPlayer, diceValue);
+        }
+
+        function movePlayer(player, value) {
+            if (player.hasWon) return;
+
+            let newPosition = player.position + value;
+            newPosition = newPosition > 100 ? 100 : newPosition;
+
+            let steps = Math.abs(newPosition - player.position);
+            let delay = 300;
+
+            for (let i = 1; i <= steps; i++) {
+                setTimeout(() => {
+                    player.position += player.position < newPosition ? 1 : -1;
+                    updatePlayerPositions();
+
+                    if (i === steps) {
+                        checkSnakeOrLadder(player);
+                    }
+                }, i * delay);
+            }
+        }
+
+        function checkSnakeOrLadder(player) {
+            setTimeout(() => {
+                const oriPosition = player.position;
+                if (ladders[player.position]) {
+                    player.position = ladders[player.position];
+                } else if (snakes[player.position]) {
+                    player.position = snakes[player.position];
+                }
+                if (player.id === 1 && player.position !== oriPosition) {
+                    if (ladders[oriPosition]) {
+                        alert('Yes, kamu naik tangga!');
+                    } else if (snakes[oriPosition]) {
+                        alert('Ya, kamu termakan ular!');
+                    }
+                }
+                updatePlayerPositions();
+                checkKickPlayer(player);
+                if (player.position === 100) {
+                    player.hasWon = true;
+                    winners.push(player.name);
+                    updateWinnersList();
+                    if (gameType === 1) {
+                        gameOver = true;
+                        displayResults();
+                        return;
+                    } else if (gameType === 3 && winners.length >= 3) {
+                        gameOver = true;
+                        displayResults();
+                        return;
+                    }
+                }
+                nextTurn();
+            }, 500);
+        }
+
+        // Fungsi untuk mengecek apakah ada pemain lain yang diinjak
+        function checkKickPlayer(activePlayer) {
+            players.forEach(player => {
+                if (player !== activePlayer && player.position === activePlayer.position && !player.hasWon) {
+                    player.position = 1; // Balik ke posisi awal jika diinjak
+                    alert(`${activePlayer.name} menginjak ${player.name}! ${player.name} kembali ke angka 1!`);
+                    updatePlayerPositions();
+                }
+            });
+        }
+
+        function updatePlayerPositions() {
+            players.forEach(player => {
+                const cell = document.getElementById(`cell-${player.position}`);
+                const rect = cell.getBoundingClientRect();
+                const boardRect = board.getBoundingClientRect();
+                player.element.style.top = `${(rect.top - boardRect.top) + rect.height / 2}px`;
+                player.element.style.left = `${(rect.left - boardRect.left) + rect.width / 2}px`;
+            });
+        }
+
+        function nextTurn() {
+            if (winners.length >= 3 || (gameType === 1 && winners.length >= 1)) {
+                gameOver = true;
+                displayResults();
+                return;
+            }
+
+            do {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            } while (players[currentPlayerIndex].hasWon);
+
+            // Tentukan giliran berikutnya apakah player atau komputer
+            isPlayerTurn = players[currentPlayerIndex].id === 1;
+            
+            if (!isPlayerTurn) {
+                setTimeout(rollDice, 1000); // Komputer otomatis melempar dadu
+            }
+        }
+
+        function displayResults() {
+            result.style.display = "block";
+            newGameButton.style.display = "block";
+        }
+
+        function updateWinnersList() {
+            winnersList.innerHTML = "";
+            winners.forEach((winnerName, index) => {
+                const listItem = document.createElement("p");
+                listItem.innerText = `${winnerName} Juara ${index + 1}`;
+                winnersList.appendChild(listItem);
+            });
+        }
+
+        function startNewGame() {
+            players.forEach(player => {
+                player.position = 1;
+                player.hasWon = false;
+                player.element.remove();
+            });
+
+            gameOver = false;
+            winners = [];
+            result.style.display = "none";
+            newGameButton.style.display = "none";
+            board.innerHTML = "";
+            currentPlayerIndex = 0;
+            isPlayerTurn = true;
+            diceResult.innerText = "🎲: 0";
+            document.getElementById('startGame').style.display = 'block';
+            document.getElementById('gameContainer').style.display = 'none';
+            gameDescription.style.display = 'block';
+        }
+
+        setInterval(() => {
+            rollDiceButton.disabled = !isPlayerTurn || gameOver;
+        }, 100);
+    </script>
+</body>
+  </html
